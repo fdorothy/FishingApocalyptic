@@ -4,16 +4,17 @@ using UnityEngine;
 
 public class FishSpawner : MonoBehaviour
 {
-    public Transform fishPrefab;
-    public Transform player;
+    public Fish fishPrefab;
 
-    List<Transform> fishes = new List<Transform>();
+    List<Fish> fishes = new List<Fish>();
+    GameObject fishParent;
     const int MAX_FISHES = 100;
-    const float MAX_RADIUS= 10f;
-    const float MAX_DEPTH = -5f;
+    BoxCollider boxCollider;
 
     private void Start()
     {
+        fishParent = GameObject.Find("Fishes");
+        boxCollider = GetComponent<BoxCollider>();
         StartCoroutine(SpawnRoutine());
     }
 
@@ -21,7 +22,6 @@ public class FishSpawner : MonoBehaviour
     {
         while (true)
         {
-            RemoveFishOutOfRange();
             while (fishes.Count < MAX_FISHES)
             {
                 SpawnFish();
@@ -33,36 +33,12 @@ public class FishSpawner : MonoBehaviour
     void SpawnFish()
     {
         // create fish somewhere in the circle around the player
-        Transform f = Instantiate(fishPrefab, transform);
-        float angle = Random.Range(0f, 360f) * Mathf.PI / 180.0f;
-        float radius = Random.Range(0f, MAX_RADIUS);
-        float depth = Random.Range(0f, MAX_DEPTH);
-        Vector3 pos = new Vector3(radius * Mathf.Cos(angle), depth, radius * Mathf.Sin(angle));
-        f.position = Flatten(player.position) + pos;
+        Fish f = Instantiate<Fish>(fishPrefab, fishParent.transform);
+        float x = Random.Range(boxCollider.bounds.min.x, boxCollider.bounds.max.x);
+        float y = Random.Range(boxCollider.bounds.min.y, boxCollider.bounds.max.y);
+        float z = Random.Range(boxCollider.bounds.min.z, boxCollider.bounds.max.z);
+        f.transform.position = new Vector3(x, y, z);
+        f.bounds = boxCollider.bounds;
         fishes.Add(f);
     }
-
-    void RemoveFishOutOfRange()
-    {
-        int i = 0;
-        while (i < fishes.Count)
-        {
-            Transform fish = fishes[i];
-            if (!IsFishInSpawnArea(fish))
-            {
-                fishes.RemoveAt(i);
-                Destroy(fish.gameObject);
-            }
-            else
-                i++;
-        }
-    }
-
-    bool IsFishInSpawnArea(Transform f)
-    {
-        float distance = Vector3.Distance(Flatten(player.position), Flatten(f.position));
-        return distance < MAX_RADIUS;
-    }
-
-    Vector3 Flatten(Vector3 p) => new Vector3(p.x, 0f, p.z);
 }

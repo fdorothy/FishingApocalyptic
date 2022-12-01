@@ -15,11 +15,13 @@ public class Player : MonoBehaviour
     public float turningSpeed = 90f;
     public Transform cameraOrigin;
     public Bobber bobberPrefab;
+    public Fishbar fishbar;
     Rigidbody rb;
     float castStrength = MIN_CAST_STRENGTH;
     const float MAX_CAST_STRENGTH = 5f;
     const float MIN_CAST_STRENGTH = 1f;
     Bobber bobber;
+    public List<Fish.FishStats> fish = new List<Fish.FishStats>();
 
     PlayerState playerState = PlayerState.READY;
 
@@ -27,6 +29,19 @@ public class Player : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        fishbar.OnHit += () =>
+        {
+            bobber.lure.fish.health -= 1;
+            if (bobber.lure.fish.health == 0)
+            {
+                fish.Add(bobber.lure.fish.fishStats);
+                PullLineIn();
+            }
+        };
+        fishbar.OnMiss += () =>
+        {
+            ReleaseFish();
+        };
     }
 
     private void Update()
@@ -48,23 +63,38 @@ public class Player : MonoBehaviour
             }
         } else if (playerState == PlayerState.CAST)
         {
-            if (Keyboard.current.spaceKey.wasPressedThisFrame)
+            if (Keyboard.current.spaceKey.isPressed)
             {
-                if (bobber.lure.bitten)
+                if (bobber)
                 {
-                    // we caught a fish!
-                    PullLineIn();
+                    Vector3 dir = (bobber.transform.position - transform.position).normalized;
+                    bobber.transform.position -= dir * Time.deltaTime;
                 }
-                else
-                {
-                    // draw the line in
-                    PullLineIn();
-                }
+            } else
+            {
+                if (bobber)
+                    if (Vector3.Distance(transform.position, bobber.transform.position) < 0.1f)
+                        PullLineIn();
             }
+        }
+
+        if (bobber && bobber.lure && bobber.lure.bitten)
+        {
+            fishbar.gameObject.SetActive(true);
+        } else
+        {
+            fishbar.gameObject.SetActive(false);
         }
     }
 
     void PullLineIn()
+    {
+        castStrength = MIN_CAST_STRENGTH;
+        Destroy(bobber.gameObject);
+        Invoke("ReadyToCast", 0.5f);
+    }
+
+    void ReleaseFish()
     {
         castStrength = MIN_CAST_STRENGTH;
         Destroy(bobber.gameObject);

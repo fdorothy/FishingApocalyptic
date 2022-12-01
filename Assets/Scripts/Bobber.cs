@@ -55,5 +55,6 @@ public class Bobber : MonoBehaviour
     {
         // bob the bobber up and down to indicate a bite
         transform.DOMoveY(-0.1f, 0.1f).SetLoops(-1, LoopType.Yoyo);
+        state = BobberStateEnum.BITE;
     }
 }

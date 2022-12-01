@@ -2,15 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class Fish : MonoBehaviour
 {
-    Transform target;
-    float fastSwimSpeed = 1.0f;
-    float slowSwimSpeed = 0.5f;
-    Lure lure;
-    bool biting = false;
 
-    const float MAX_DEPTH = 5f;
+    [System.Serializable]
+    public struct FishStats
+    {
+        public Sprite sprite;
+        public string name;
+        public int cost;
+    }
+
+    public float fastSwimSpeed = 1.0f;
+    public float slowSwimSpeed = 0.5f;
+    public int health = 1, maxHealth = 1;
+    public float cursorSpeed = 1.0f;
+    public Bounds bounds;
+
+    Transform target;
+    Lure lure;
+
+    public FishStats fishStats = new FishStats();
 
     // Start is called before the first frame update
     void Start()
@@ -25,13 +38,13 @@ public class Fish : MonoBehaviour
         while (true)
         {
             // slightly change direction randomly
-            float theta = 10f;
+            float theta = 5f;
             transform.rotation *= Quaternion.Euler(Random.Range(-theta, theta), Random.Range(-theta, theta), Random.Range(-theta, theta));
             yield return new WaitForSeconds(1.0f);
 
             // check if we are close to the target lure
             lure = FindObjectOfType<Lure>();
-            if (lure != null)
+            if (lure != null && !lure.bitten)
             {
                 if (Vector3.Distance(transform.position, lure.transform.position) < 1.0f)
                     target = lure.transform;
@@ -51,10 +64,9 @@ public class Fish : MonoBehaviour
             } else
             {
                 // bite the lure!
-                if (lure && !biting && !lure.bitten)
+                if (lure && !lure.bitten)
                 {
                     lure.Bite(this);
-                    biting = true;
                 }
             }
         } else
@@ -63,7 +75,11 @@ public class Fish : MonoBehaviour
             transform.position += slowSwimSpeed * transform.forward * Time.deltaTime;
         }
 
-        // clamp the position to just below the waterline and above our max depth
-        transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -MAX_DEPTH, 0.0f), transform.position.z);
+        // clamp the position to our bounding box
+        transform.position = new Vector3(
+            Mathf.Clamp(transform.position.x, bounds.min.x, bounds.max.x),
+            Mathf.Clamp(transform.position.y, bounds.min.y, bounds.max.y),
+            Mathf.Clamp(transform.position.z, bounds.min.z, bounds.max.z)
+        );
     }
 }

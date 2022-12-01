@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Billboard : MonoBehaviour
 {
-    bool useStatic = true;
+    public bool useStatic = true;
+    public bool yonly = true;
     Camera camera;
 
     // Start is called before the first frame update
@@ -24,7 +25,8 @@ public class Billboard : MonoBehaviour
         {
             Vector3 p = camera.transform.position;
             transform.LookAt(p);
-            transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
+            if (yonly)
+                transform.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
         }
     }
 }

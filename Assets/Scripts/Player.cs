@@ -169,7 +169,7 @@ public class Player : MonoBehaviour
 
         rb.MovePosition(transform.position + transform.forward * s * Time.deltaTime);
         cameraOrigin.rotation = cameraOrigin.rotation * Quaternion.Euler(0f, turn * Time.deltaTime, 0f);
-        rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, cameraOrigin.rotation, Time.deltaTime * s * turningSpeed));
+        rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, cameraOrigin.rotation, Time.deltaTime * Mathf.Abs(s) * turningSpeed));
     }
 
     public void Cast()

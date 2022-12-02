@@ -22,9 +22,11 @@ public class Player : MonoBehaviour
     public float minCastStrength = 1f;
     public List<Fish.FishStats> fish = new List<Fish.FishStats>();
 
+
     Rigidbody rb;
     float castStrength;
     Bobber bobber;
+    Dock dock;
 
     PlayerState playerState = PlayerState.READY;
 
@@ -195,6 +197,8 @@ public class Player : MonoBehaviour
             Debug.Log("at the dock");
             playerState = PlayerState.DOCKED;
             castStrength = minCastStrength;
+            dock = other.GetComponent<Dock>();
+            Messages.singleton.SetMessage("<spacebar>");
             if (bobber)
                 Destroy(bobber.gameObject);
         }
@@ -206,6 +210,7 @@ public class Player : MonoBehaviour
         {
             Debug.Log("leaving dock");
             playerState = PlayerState.READY;
+            Messages.singleton.HideMessage();
         }
     }
 

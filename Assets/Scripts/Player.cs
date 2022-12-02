@@ -9,7 +9,8 @@ public class Player : MonoBehaviour
     {
         READY,
         CAST,
-        BITE
+        BITE,
+        DOCKED
     }
 
     public float speed = 1.0f;
@@ -50,42 +51,17 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        if (playerState == PlayerState.READY)
+        switch (playerState)
         {
-            if (Keyboard.current.spaceKey.isPressed)
-            {
-                castStrength += Time.deltaTime;
-            }
-            if (Keyboard.current.spaceKey.wasReleasedThisFrame)
-            {
-                Cast();
-                castStrength = minCastStrength;
-            }
-            if (castStrength > maxCastStrength)
-            {
-                castStrength = maxCastStrength;
-            }
-        } else if (playerState == PlayerState.CAST)
-        {
-            if (Keyboard.current.spaceKey.isPressed)
-            {
-                if (bobber)
-                {
-                    Vector3 dir = (bobber.transform.position - transform.position).normalized;
-                    bobber.transform.position -= dir * Time.deltaTime;
-                }
-            } else
-            {
-                if (bobber)
-                    if (Vector3.Distance(transform.position, bobber.transform.position) < 0.1f)
-                        PullLineIn();
-            }
-        } else if (playerState == PlayerState.BITE)
-        {
-            if (UnityEngine.InputSystem.Keyboard.current.spaceKey.wasPressedThisFrame)
-            {
-                fishbar.HitSpace();
-            }
+            case PlayerState.READY:
+                UpdateReady();
+                break;
+            case PlayerState.CAST:
+                UpdateCast();
+                break;
+            case PlayerState.BITE:
+                UpdateBite();
+                break;
         }
 
         if (bobber && bobber.lure && bobber.lure.bitten)
@@ -101,6 +77,49 @@ public class Player : MonoBehaviour
             {
                 fishbar.gameObject.SetActive(false);
             }
+        }
+    }
+
+    void UpdateReady()
+    {
+        if (Keyboard.current.spaceKey.isPressed)
+        {
+            castStrength += Time.deltaTime;
+        }
+        if (Keyboard.current.spaceKey.wasReleasedThisFrame)
+        {
+            Cast();
+            castStrength = minCastStrength;
+        }
+        if (castStrength > maxCastStrength)
+        {
+            castStrength = maxCastStrength;
+        }
+    }
+
+    void UpdateCast()
+    {
+        if (Keyboard.current.spaceKey.isPressed)
+        {
+            if (bobber)
+            {
+                Vector3 dir = (bobber.transform.position - transform.position).normalized;
+                bobber.transform.position -= dir * Time.deltaTime;
+            }
+        }
+        else
+        {
+            if (bobber)
+                if (Vector3.Distance(transform.position, bobber.transform.position) < 0.1f)
+                    PullLineIn();
+        }
+    }
+
+    void UpdateBite()
+    {
+        if (UnityEngine.InputSystem.Keyboard.current.spaceKey.wasPressedThisFrame)
+        {
+            fishbar.HitSpace();
         }
     }
 
@@ -167,6 +186,27 @@ public class Player : MonoBehaviour
     {
         playerState = PlayerState.BITE;
         bobber.Bite(fish);
+    }
+
+    public void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Dock")
+        {
+            Debug.Log("at the dock");
+            playerState = PlayerState.DOCKED;
+            castStrength = minCastStrength;
+            if (bobber)
+                Destroy(bobber.gameObject);
+        }
+    }
+
+    public void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "Dock")
+        {
+            Debug.Log("leaving dock");
+            playerState = PlayerState.READY;
+        }
     }
 
     Vector3 Flatten(Vector3 p) => new Vector3(p.x, 0f, p.z);

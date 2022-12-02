@@ -111,15 +111,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b49568429f1ea140814f880b9789202, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fastSwimSpeed: 1
-  slowSwimSpeed: 0.5
-  health: 1
-  maxHealth: 1
+  fastSwimSpeed: 0.5
+  slowSwimSpeed: 0.1
+  health: 2
+  maxHealth: 2
   cursorSpeed: 1
   bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
+  biting: 0
   fishStats:
     sprite: {fileID: 0}
     name: little fish
     cost: 1
+    targetSize: 0.5

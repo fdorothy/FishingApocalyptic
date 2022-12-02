@@ -6,7 +6,7 @@ public class Billboard : MonoBehaviour
 {
     public bool useStatic = true;
     public bool yonly = true;
-    Camera camera;
+    new Camera camera;
 
     // Start is called before the first frame update
     void Start()

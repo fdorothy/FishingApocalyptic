@@ -8,7 +8,8 @@ public class Player : MonoBehaviour
     public enum PlayerState
     {
         READY,
-        CAST
+        CAST,
+        BITE
     }
 
     public float speed = 1.0f;
@@ -16,18 +17,20 @@ public class Player : MonoBehaviour
     public Transform cameraOrigin;
     public Bobber bobberPrefab;
     public Fishbar fishbar;
-    Rigidbody rb;
-    float castStrength = MIN_CAST_STRENGTH;
-    const float MAX_CAST_STRENGTH = 5f;
-    const float MIN_CAST_STRENGTH = 1f;
-    Bobber bobber;
+    public float maxCastStrength = 5f;
+    public float minCastStrength = 1f;
     public List<Fish.FishStats> fish = new List<Fish.FishStats>();
+
+    Rigidbody rb;
+    float castStrength;
+    Bobber bobber;
 
     PlayerState playerState = PlayerState.READY;
 
     // Start is called before the first frame update
     void Start()
     {
+        castStrength = minCastStrength;
         rb = GetComponent<Rigidbody>();
         fishbar.OnHit += () =>
         {
@@ -35,6 +38,7 @@ public class Player : MonoBehaviour
             if (bobber.lure.fish.health == 0)
             {
                 fish.Add(bobber.lure.fish.fishStats);
+                Destroy(bobber.lure.fish.gameObject);
                 PullLineIn();
             }
         };
@@ -55,11 +59,11 @@ public class Player : MonoBehaviour
             if (Keyboard.current.spaceKey.wasReleasedThisFrame)
             {
                 Cast();
-                castStrength = MIN_CAST_STRENGTH;
+                castStrength = minCastStrength;
             }
-            if (castStrength > MAX_CAST_STRENGTH)
+            if (castStrength > maxCastStrength)
             {
-                castStrength = MAX_CAST_STRENGTH;
+                castStrength = maxCastStrength;
             }
         } else if (playerState == PlayerState.CAST)
         {
@@ -76,27 +80,41 @@ public class Player : MonoBehaviour
                     if (Vector3.Distance(transform.position, bobber.transform.position) < 0.1f)
                         PullLineIn();
             }
+        } else if (playerState == PlayerState.BITE)
+        {
+            if (UnityEngine.InputSystem.Keyboard.current.spaceKey.wasPressedThisFrame)
+            {
+                fishbar.HitSpace();
+            }
         }
 
         if (bobber && bobber.lure && bobber.lure.bitten)
         {
-            fishbar.gameObject.SetActive(true);
+            if (!fishbar.gameObject.activeSelf)
+            {
+                fishbar.SetTargetSize(bobber.lure.fish.fishStats.targetSize);
+                fishbar.gameObject.SetActive(true);
+            }
         } else
         {
-            fishbar.gameObject.SetActive(false);
+            if (fishbar.gameObject.activeSelf)
+            {
+                fishbar.gameObject.SetActive(false);
+            }
         }
     }
 
     void PullLineIn()
     {
-        castStrength = MIN_CAST_STRENGTH;
+        castStrength = minCastStrength;
         Destroy(bobber.gameObject);
         Invoke("ReadyToCast", 0.5f);
     }
 
     void ReleaseFish()
     {
-        castStrength = MIN_CAST_STRENGTH;
+        castStrength = minCastStrength;
+        bobber.ReleaseFish();
         Destroy(bobber.gameObject);
         Invoke("ReadyToCast", 0.5f);
     }
@@ -144,5 +162,12 @@ public class Player : MonoBehaviour
         rb.velocity = dir * castStrength * 2f;
         playerState = PlayerState.CAST;
     }
+
+    public void Bite(Fish fish)
+    {
+        playerState = PlayerState.BITE;
+        bobber.Bite(fish);
+    }
+
     Vector3 Flatten(Vector3 p) => new Vector3(p.x, 0f, p.z);
 }

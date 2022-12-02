@@ -16,6 +16,7 @@ public class Bobber : MonoBehaviour
     BobberStateEnum state = BobberStateEnum.CAST;
 
     Rigidbody rb;
+    Tween activeTween;
 
     public Lure lurePrefab;
     public Lure lure;
@@ -54,7 +55,25 @@ public class Bobber : MonoBehaviour
     public void Bite(Fish fish)
     {
         // bob the bobber up and down to indicate a bite
-        transform.DOMoveY(-0.1f, 0.1f).SetLoops(-1, LoopType.Yoyo);
+        StopBobbing();
+        activeTween = transform.DOMoveY(-0.1f, 0.1f).SetLoops(-1, LoopType.Yoyo);
         state = BobberStateEnum.BITE;
+        lure.Bite(fish);
+    }
+
+    public void ReleaseFish()
+    {
+        if (lure)
+            lure.ReleaseFish();
+        StopBobbing();
+    }
+
+    public void StopBobbing()
+    {
+        if (activeTween != null)
+        {
+            activeTween.Kill(false);
+            transform.position = new Vector3(transform.position.x, 0f, transform.position.z);
+        }
     }
 }

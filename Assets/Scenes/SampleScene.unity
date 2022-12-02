@@ -374,6 +374,7 @@ MonoBehaviour:
   max: {fileID: 1633696157}
   hitLine: {fileID: 340196010}
   cursor: {fileID: 284799810}
+  reverseDirectionCounter: 0
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -675,6 +676,9 @@ MonoBehaviour:
   bobberPrefab: {fileID: 4916841910696635703, guid: e0a3150996a8047489ec1bc4bfd58f42,
     type: 3}
   fishbar: {fileID: 294185523}
+  maxCastStrength: 5
+  minCastStrength: 1
+  fish: []
 --- !u!54 &350509711
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -840,6 +844,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fishPrefab: {fileID: 3756931743739792552, guid: 39f1cf4f7fbb8bd489bf198231799e57,
     type: 3}
+  maxFish: 10
 --- !u!65 &544141593
 BoxCollider:
   m_ObjectHideFlags: 0

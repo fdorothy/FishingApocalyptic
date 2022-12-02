@@ -10,8 +10,15 @@ public class Lure : MonoBehaviour
 
     public void Bite(Fish fish)
     {
-        bobber.Bite(fish);
         bitten = true;
         this.fish = fish;
+    }
+
+    public void ReleaseFish()
+    {
+        bitten = false;
+        if (fish)
+            fish.ReleaseFish();
+        fish = null;
     }
 }

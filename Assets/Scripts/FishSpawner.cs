@@ -8,7 +8,7 @@ public class FishSpawner : MonoBehaviour
 
     List<Fish> fishes = new List<Fish>();
     GameObject fishParent;
-    const int MAX_FISHES = 100;
+    public int maxFish = 10;
     BoxCollider boxCollider;
 
     private void Start()
@@ -22,7 +22,15 @@ public class FishSpawner : MonoBehaviour
     {
         while (true)
         {
-            while (fishes.Count < MAX_FISHES)
+            int i = 0;
+            while (i < fishes.Count)
+            {
+                if (!fishes[i])
+                    fishes.RemoveAt(i);
+                else
+                    i++;
+            }
+            while (fishes.Count < maxFish)
             {
                 SpawnFish();
             }

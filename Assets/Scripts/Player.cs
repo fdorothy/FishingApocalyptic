@@ -141,7 +141,8 @@ public class Player : MonoBehaviour
     void PullLineIn()
     {
         castStrength = minCastStrength;
-        Destroy(bobber.gameObject);
+        if (bobber)
+            Destroy(bobber.gameObject);
         Invoke("ReadyToCast", 0.5f);
     }
 

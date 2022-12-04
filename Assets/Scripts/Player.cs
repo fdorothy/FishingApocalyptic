@@ -27,12 +27,25 @@ public class Player : MonoBehaviour
     float castStrength;
     Bobber bobber;
     Dock dock;
+    Timer timer;
+    Vector3 startPosition;
+    Quaternion startRotation;
 
     PlayerState playerState = PlayerState.READY;
 
     // Start is called before the first frame update
     void Start()
     {
+        startPosition = transform.position;
+        startRotation = transform.rotation;
+        timer = FindObjectOfType<Timer>();
+        timer.OnTimer += () =>
+        {
+            transform.position = startPosition;
+            transform.rotation = startRotation;
+            PullLineIn();
+            timer.SetTimer(30f);
+        };
         castStrength = minCastStrength;
         rb = GetComponent<Rigidbody>();
         fishbar.OnHit += () =>
@@ -167,6 +180,7 @@ public class Player : MonoBehaviour
             turn += turningSpeed;
         }
 
+        rb.velocity = Vector3.zero;
         rb.MovePosition(transform.position + transform.forward * s * Time.deltaTime);
         cameraOrigin.rotation = cameraOrigin.rotation * Quaternion.Euler(0f, turn * Time.deltaTime, 0f);
         rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, cameraOrigin.rotation, Time.deltaTime * Mathf.Abs(s) * turningSpeed));
@@ -199,6 +213,7 @@ public class Player : MonoBehaviour
             castStrength = minCastStrength;
             dock = other.GetComponent<Dock>();
             Messages.singleton.SetMessage("<spacebar>");
+            timer.paused = true;
             if (bobber)
                 Destroy(bobber.gameObject);
         }
@@ -211,6 +226,7 @@ public class Player : MonoBehaviour
             Debug.Log("leaving dock");
             playerState = PlayerState.READY;
             Messages.singleton.HideMessage();
+            timer.paused = false;
         }
     }
 

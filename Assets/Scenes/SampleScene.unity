@@ -303,8 +303,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1.7634884, y: 0.9999998, z: 0.49965066}
-  m_Center: {x: 0.381745, y: 0, z: -0.00511988}
+  m_Size: {x: 2.4931026, y: 0.9999998, z: 0.49965063}
+  m_Center: {x: 0.016935883, y: 0, z: -0.0051198704}
 --- !u!1 &264932397
 GameObject:
   m_ObjectHideFlags: 0
@@ -862,6 +862,7 @@ GameObject:
   - component: {fileID: 350509709}
   - component: {fileID: 350509710}
   - component: {fileID: 350509711}
+  - component: {fileID: 350509712}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -923,6 +924,19 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 116
   m_CollisionDetection: 1
+--- !u!65 &350509712
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 350509708}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.17120956, y: 0.086269915, z: 0.3239249}
+  m_Center: {x: -0.03452699, y: 0.036173522, z: 0.06670302}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -959,7 +973,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 2
+    m_Type: 0
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1

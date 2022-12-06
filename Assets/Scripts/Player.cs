@@ -21,7 +21,6 @@ public class Player : MonoBehaviour
     public Fishbar fishbar;
     public float maxCastStrength = 5f;
     public float minCastStrength = 1f;
-    public List<Fish.FishStats> fish = new List<Fish.FishStats>();
     UpgradeMenu upgradeMenu;
 
     public class PlayerStatistics
@@ -48,6 +47,23 @@ public class Player : MonoBehaviour
         }
     }
 
+    public float fishProbability
+    {
+        get
+        {
+            switch (playerStatistics.lure)
+            {
+                case 1: return 0.0f;
+                case 2: return 0.1f;
+                case 3: return 0.2f;
+                case 4: return 0.3f;
+                case 5: return 0.4f;
+                case 6: return 0.5f;
+                default: return 0.0f;
+            }
+        }
+    }
+
     Rigidbody rb;
     float castStrength;
     Bobber bobber;
@@ -55,7 +71,8 @@ public class Player : MonoBehaviour
     Timer timer;
     Vector3 startPosition;
     Quaternion startRotation;
-
+    Coroutine fishingRoutine;
+    int fishPoints = 0;
     PlayerState playerState = PlayerState.READY;
 
     // Start is called before the first frame update
@@ -84,18 +101,39 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         fishbar.OnHit += () =>
         {
-            bobber.lure.fish.health -= 1;
-            if (bobber.lure.fish.health == 0)
-            {
-                fish.Add(bobber.lure.fish.fishStats);
-                Destroy(bobber.lure.fish.gameObject);
-                PullLineIn();
-            }
+            Debug.Log("hit!");
+            playerStatistics.points += fishPoints;
+            PullLineIn();
         };
         fishbar.OnMiss += () =>
         {
             ReleaseFish();
         };
+    }
+
+    /**
+     * Routine that handles when we get a bite
+     */
+    public IEnumerator FishingRoutine()
+    {
+        yield return new WaitForSeconds(1.0f);
+        while (bobber)
+        {
+            if (playerState == PlayerState.CAST)
+            {
+                float p = Random.Range(0.0f, 1.0f);
+                if (p < fishProbability && bobber)
+                {
+                    fishPoints = 1;
+                    Bite();
+                } else if (p < 0.8f)
+                {
+                    fishPoints = 0;
+                    Bite();
+                }
+            }
+            yield return new WaitForSeconds(1.0f);
+        }
     }
 
     private void Update()
@@ -119,11 +157,11 @@ public class Player : MonoBehaviour
                 break;
         }
 
-        if (bobber && bobber.lure && bobber.lure.bitten)
+        if (bobber && bobber.Bitten)
         {
             if (!fishbar.gameObject.activeSelf)
             {
-                fishbar.SetTargetSize(bobber.lure.fish.fishStats.targetSize);
+                fishbar.SetTargetSize(0.5f);
                 fishbar.gameObject.SetActive(true);
             }
         } else
@@ -183,6 +221,7 @@ public class Player : MonoBehaviour
         castStrength = minCastStrength;
         if (bobber)
             Destroy(bobber.gameObject);
+        fishbar.gameObject.SetActive(false);
         Invoke("ReadyToCast", 0.5f);
     }
 
@@ -237,12 +276,14 @@ public class Player : MonoBehaviour
         Rigidbody rb = bobber.GetComponent<Rigidbody>();
         rb.velocity = dir * castStrength * 2f;
         playerState = PlayerState.CAST;
+        StartFishing();
     }
 
-    public void Bite(Fish fish)
+    public void Bite()
     {
         playerState = PlayerState.BITE;
-        bobber.Bite(fish);
+        bobber.Bite();
+        StopFishing();
     }
 
     public void OnTriggerEnter(Collider other)
@@ -257,6 +298,7 @@ public class Player : MonoBehaviour
             timer.paused = true;
             if (bobber)
                 Destroy(bobber.gameObject);
+            StopFishing();
         }
     }
 
@@ -270,6 +312,19 @@ public class Player : MonoBehaviour
             timer.paused = false;
             upgradeMenu.gameObject.SetActive(false);
         }
+    }
+
+    void StopFishing()
+    {
+        if (fishingRoutine != null)
+            StopCoroutine(fishingRoutine);
+        fishingRoutine = null;
+    }
+
+    void StartFishing()
+    {
+        StopFishing();
+        fishingRoutine = StartCoroutine(FishingRoutine());
     }
 
     Vector3 Flatten(Vector3 p) => new Vector3(p.x, 0f, p.z);

@@ -13,7 +13,8 @@ public class Player : MonoBehaviour
         DOCKED
     }
 
-    public float speed = 1.0f;
+    public PlayerStatistics playerStatistics;
+    //public float speed = 1.0f;
     public float turningSpeed = 90f;
     public Transform cameraOrigin;
     public Bobber bobberPrefab;
@@ -21,7 +22,31 @@ public class Player : MonoBehaviour
     public float maxCastStrength = 5f;
     public float minCastStrength = 1f;
     public List<Fish.FishStats> fish = new List<Fish.FishStats>();
+    UpgradeMenu upgradeMenu;
 
+    public class PlayerStatistics
+    {
+        public int gas;
+        public int lure;
+        public int speed;
+        public int points;
+    }
+
+    public float speed
+    {
+        get {
+            switch (playerStatistics.speed)
+            {
+                case 1: return 0.5f;
+                case 2: return 0.6f;
+                case 3: return 0.7f;
+                case 4: return 0.8f;
+                case 5: return 0.9f;
+                case 6: return 1.0f;
+                default: return 0.5f;
+            }
+        }
+    }
 
     Rigidbody rb;
     float castStrength;
@@ -36,6 +61,15 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        upgradeMenu = FindObjectOfType<UpgradeMenu>();
+        upgradeMenu.OnClose();
+        playerStatistics = new PlayerStatistics()
+        {
+            gas=1,
+            lure=1,
+            speed=1,
+            points=10
+        };
         startPosition = transform.position;
         startRotation = transform.rotation;
         timer = FindObjectOfType<Timer>();
@@ -76,6 +110,12 @@ public class Player : MonoBehaviour
                 break;
             case PlayerState.BITE:
                 UpdateBite();
+                break;
+            case PlayerState.DOCKED:
+                if (Keyboard.current.spaceKey.wasPressedThisFrame)
+                {
+                    upgradeMenu.gameObject.SetActive(!upgradeMenu.gameObject.activeSelf);
+                }
                 break;
         }
 
@@ -228,6 +268,7 @@ public class Player : MonoBehaviour
             playerState = PlayerState.READY;
             Messages.singleton.HideMessage();
             timer.paused = false;
+            upgradeMenu.gameObject.SetActive(false);
         }
     }
 

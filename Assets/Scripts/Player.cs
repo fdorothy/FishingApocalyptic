@@ -21,6 +21,7 @@ public class Player : MonoBehaviour
     public Fishbar fishbar;
     public float maxCastStrength = 5f;
     public float minCastStrength = 1f;
+    public LineRenderer lr;
     UpgradeMenu upgradeMenu;
 
     public class PlayerStatistics
@@ -102,7 +103,7 @@ public class Player : MonoBehaviour
             gas=1,
             lure=1,
             speed=1,
-            points=10
+            points=0
         };
         startPosition = transform.position;
         startRotation = transform.rotation;
@@ -139,7 +140,11 @@ public class Player : MonoBehaviour
             if (playerState == PlayerState.CAST)
             {
                 float p = Random.Range(0.0f, 1.0f);
-                if (p < fishProbability && bobber)
+                float fishProb = fishProbability;
+                if (bobber && bobber.inBubbles)
+                    fishProb += 0.5f;
+                Debug.Log("fish prob = " + fishProb);
+                if (p < fishProb && bobber)
                 {
                     fishPoints = 1;
                     Bite();
@@ -189,6 +194,7 @@ public class Player : MonoBehaviour
                 fishbar.gameObject.SetActive(false);
             }
         }
+        UpdateLine();
     }
 
     void UpdateReady()
@@ -231,6 +237,20 @@ public class Player : MonoBehaviour
         if (UnityEngine.InputSystem.Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             fishbar.HitSpace();
+        }
+    }
+
+    void UpdateLine()
+    {
+        if (bobber)
+        {
+            lr.gameObject.SetActive(true);
+            lr.SetPosition(0, transform.position + Vector3.up * 0.1f);
+            lr.SetPosition(1, bobber.transform.position + Vector3.up * 0.05f);
+        }
+        else
+        {
+            lr.gameObject.SetActive(false);
         }
     }
 

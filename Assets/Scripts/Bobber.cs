@@ -17,6 +17,7 @@ public class Bobber : MonoBehaviour
 
     Rigidbody rb;
     Tween activeTween;
+    public bool inBubbles = false;
 
     // Start is called before the first frame update
     void Start()
@@ -66,6 +67,24 @@ public class Bobber : MonoBehaviour
         {
             activeTween.Kill(false);
             transform.position = new Vector3(transform.position.x, 0f, transform.position.z);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Bubble")
+        {
+            inBubbles = true;
+            Debug.Log("in the bubble");
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.tag == "Bubble")
+        {
+            inBubbles = false;
+            Debug.Log("left the bubble");
         }
     }
 }

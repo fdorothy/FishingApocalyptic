@@ -64,6 +64,23 @@ public class Player : MonoBehaviour
         }
     }
 
+    public float maxTime
+    {
+        get
+        {
+            switch (playerStatistics.gas)
+            {
+                case 1: return 15f;
+                case 2: return 20f;
+                case 3: return 25f;
+                case 4: return 30f;
+                case 5: return 45f;
+                case 6: return 50f;
+                default: return 15f;
+            }
+        }
+    }
+
     Rigidbody rb;
     float castStrength;
     Bobber bobber;
@@ -154,6 +171,7 @@ public class Player : MonoBehaviour
                 {
                     upgradeMenu.gameObject.SetActive(!upgradeMenu.gameObject.activeSelf);
                 }
+                timer.SetTimer(maxTime);
                 break;
         }
 

@@ -21,6 +21,7 @@ public class Player : MonoBehaviour
     public Fishbar fishbar;
     public float maxCastStrength = 5f;
     public float minCastStrength = 1f;
+    public float gas = 0f;
     public LineRenderer lr;
     UpgradeMenu upgradeMenu;
 
@@ -65,7 +66,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    public float maxTime
+    public float maxGas
     {
         get
         {
@@ -105,6 +106,7 @@ public class Player : MonoBehaviour
             speed=1,
             points=0
         };
+        gas = maxGas;
         startPosition = transform.position;
         startRotation = transform.rotation;
         timer = FindObjectOfType<Timer>();
@@ -115,7 +117,7 @@ public class Player : MonoBehaviour
             PullLineIn(false);
             Debug.Log("setting state to docked");
             playerState = PlayerState.DOCKED;
-            timer.SetTimer(maxTime);
+            gas = maxGas;
         };
         castStrength = minCastStrength;
         rb = GetComponent<Rigidbody>();
@@ -178,7 +180,7 @@ public class Player : MonoBehaviour
                 {
                     upgradeMenu.gameObject.SetActive(!upgradeMenu.gameObject.activeSelf);
                 }
-                timer.SetTimer(maxTime);
+                gas = maxGas;
                 break;
         }
 
@@ -304,6 +306,8 @@ public class Player : MonoBehaviour
 
         rb.velocity = Vector3.zero;
         rb.MovePosition(transform.position + transform.forward * s * Time.deltaTime);
+        if (s != 0.0f)
+            gas -= Time.deltaTime;
         cameraOrigin.rotation = cameraOrigin.rotation * Quaternion.Euler(0f, turn * Time.deltaTime, 0f);
         rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, cameraOrigin.rotation, Time.deltaTime * Mathf.Abs(s) * turningSpeed));
     }

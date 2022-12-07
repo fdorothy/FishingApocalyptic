@@ -112,8 +112,10 @@ public class Player : MonoBehaviour
         {
             transform.position = startPosition;
             transform.rotation = startRotation;
-            PullLineIn();
-            timer.SetTimer(30f);
+            PullLineIn(false);
+            Debug.Log("setting state to docked");
+            playerState = PlayerState.DOCKED;
+            timer.SetTimer(maxTime);
         };
         castStrength = minCastStrength;
         rb = GetComponent<Rigidbody>();
@@ -254,13 +256,14 @@ public class Player : MonoBehaviour
         }
     }
 
-    void PullLineIn()
+    void PullLineIn(bool readyToCast = true)
     {
         castStrength = minCastStrength;
         if (bobber)
             Destroy(bobber.gameObject);
         fishbar.gameObject.SetActive(false);
-        Invoke("ReadyToCast", 0.5f);
+        if (readyToCast)
+            Invoke("ReadyToCast", 0.5f);
     }
 
     void ReleaseFish()
@@ -273,7 +276,8 @@ public class Player : MonoBehaviour
 
     void ReadyToCast()
     {
-        playerState = PlayerState.READY;
+        if (playerState != PlayerState.DOCKED)
+            playerState = PlayerState.READY;
     }
 
     // Update is called once per frame

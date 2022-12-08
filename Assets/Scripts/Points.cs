@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Statistics : MonoBehaviour
+public class Points : MonoBehaviour
 {
     Player player;
     TMPro.TMP_Text text;
@@ -20,7 +20,7 @@ public class Statistics : MonoBehaviour
         if (player && text)
         {
             Player.PlayerStatistics s = player.playerStatistics;
-            text.text = string.Format("Points: {0}\nGas: {1}\nLure: {2}\nSpeed: {3}", s.points, s.gas, s.lure, s.speed);
+            text.text = s.points.ToString();
         }
     }
 }

@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Timer : MonoBehaviour
 {
-    TMPro.TMP_Text text;
+    public Image gasImage;
     public bool paused = false;
 
     public System.Action OnTimer;
@@ -13,7 +14,6 @@ public class Timer : MonoBehaviour
     public void Start()
     {
         player = FindObjectOfType<Player>();
-        text = GetComponent<TMPro.TMP_Text>();
     }
 
     public void Update()
@@ -23,6 +23,7 @@ public class Timer : MonoBehaviour
             player.gas = 0f;
             OnTimer.Invoke();
         }
-        text.text = System.String.Format("{0}", (int)player.gas);
+        gasImage.fillAmount = (float)player.gas / player.maxGas;
+        gasImage.fillMethod = Image.FillMethod.Horizontal;
     }
 }

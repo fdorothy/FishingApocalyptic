@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Dock
   - Bubble
+  - NPC
   layers:
   - Default
   - TransparentFX

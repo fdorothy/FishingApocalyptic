@@ -10,7 +10,9 @@ public class Player : MonoBehaviour
         READY,
         CAST,
         BITE,
-        DOCKED
+        DOCKED,
+        NPC,
+        DIALOGUE
     }
 
     public PlayerStatistics playerStatistics;
@@ -24,6 +26,7 @@ public class Player : MonoBehaviour
     public float gas = 0f;
     public LineRenderer lr;
     UpgradeMenu upgradeMenu;
+    NPC currentNPC;
 
     public class PlayerStatistics
     {
@@ -176,11 +179,13 @@ public class Player : MonoBehaviour
                 UpdateBite();
                 break;
             case PlayerState.DOCKED:
-                if (Keyboard.current.spaceKey.wasPressedThisFrame)
-                {
-                    upgradeMenu.gameObject.SetActive(!upgradeMenu.gameObject.activeSelf);
-                }
-                gas = maxGas;
+                UpdateDocked();
+                break;
+            case PlayerState.NPC:
+                UpdateNPC();
+                break;
+            case PlayerState.DIALOGUE:
+                UpdateDialogue();
                 break;
         }
 
@@ -241,6 +246,35 @@ public class Player : MonoBehaviour
         if (UnityEngine.InputSystem.Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             fishbar.HitSpace();
+        }
+    }
+
+    void UpdateDocked()
+    {
+        if (Keyboard.current.spaceKey.wasPressedThisFrame)
+            upgradeMenu.gameObject.SetActive(!upgradeMenu.gameObject.activeSelf);
+        gas = maxGas;
+    }
+
+    void UpdateNPC()
+    {
+        if (Keyboard.current.spaceKey.wasPressedThisFrame)
+        {
+            currentNPC.Play();
+            PullLineIn(false);
+            playerState = PlayerState.DIALOGUE;
+        }
+    }
+    void UpdateDialogue()
+    {
+        if (Keyboard.current.spaceKey.wasPressedThisFrame)
+        {
+            StoryManager.singleton.Continue();
+            if (!StoryManager.singleton.story.canContinue)
+            {
+                Invoke("ReadyToCast", 0.5f);
+                Messages.singleton.HideMessage();
+            }
         }
     }
 
@@ -346,6 +380,12 @@ public class Player : MonoBehaviour
                 Destroy(bobber.gameObject);
             StopFishing();
         }
+        if (other.gameObject.tag == "NPC")
+        {
+            Messages.singleton.SetMessage("<spacebar>");
+            currentNPC = other.gameObject.GetComponent<NPC>();
+            playerState = PlayerState.NPC;
+        }
     }
 
     public void OnTriggerExit(Collider other)
@@ -357,6 +397,11 @@ public class Player : MonoBehaviour
             Messages.singleton.HideMessage();
             timer.paused = false;
             upgradeMenu.gameObject.SetActive(false);
+        }
+        if (other.gameObject.tag == "NPC")
+        {
+            playerState = PlayerState.READY;
+            Messages.singleton.HideMessage();
         }
     }
 

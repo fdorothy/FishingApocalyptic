@@ -17,8 +17,13 @@ public class Messages : MonoBehaviour
 
     public void SetMessage(string text)
     {
-        panel.gameObject.SetActive(true);
         this.text.text = text;
+        
+        // dumb hack to force a resize event to fit to new text
+        var elem = this.text.GetComponent<UnityEngine.UI.ContentSizeFitter>();
+        elem.SetLayoutHorizontal();
+
+        panel.gameObject.SetActive(true);
     }
 
     public void HideMessage()

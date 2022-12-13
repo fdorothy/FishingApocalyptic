@@ -13,7 +13,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: white
-    second: {fileID: 2100000, guid: 494ce0107470fb949be9db06d63c0142, type: 2}
+    second: {fileID: 2100000, guid: 8acc4eea5325ac74b96a81d603e9b0a0, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

@@ -16,7 +16,7 @@ public class Player : MonoBehaviour
     }
 
     public PlayerStatistics playerStatistics;
-    //public float speed = 1.0f;
+    public float speed = 1.0f;
     public float turningSpeed = 90f;
     public Transform cameraOrigin;
     public Bobber bobberPrefab;
@@ -27,6 +27,7 @@ public class Player : MonoBehaviour
     public LineRenderer lr;
     UpgradeMenu upgradeMenu;
     NPC currentNPC;
+    public ParticleSystem wakeSystem;
 
     public class PlayerStatistics
     {
@@ -36,7 +37,7 @@ public class Player : MonoBehaviour
         public int points;
     }
 
-    public float speed
+    public float maxSpeed
     {
         get {
             switch (playerStatistics.speed)
@@ -102,6 +103,7 @@ public class Player : MonoBehaviour
     {
         upgradeMenu = FindObjectOfType<UpgradeMenu>();
         upgradeMenu.OnClose();
+        wakeSystem.Stop();
         playerStatistics = new PlayerStatistics()
         {
             gas=1,
@@ -269,11 +271,13 @@ public class Player : MonoBehaviour
     {
         if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
-            StoryManager.singleton.Continue();
             if (!StoryManager.singleton.story.canContinue)
             {
                 Invoke("ReadyToCast", 0.5f);
                 Messages.singleton.HideMessage();
+            } else
+            {
+                StoryManager.singleton.Continue();
             }
         }
     }
@@ -323,11 +327,11 @@ public class Player : MonoBehaviour
         float turn = 0.0f;
         if (Keyboard.current.wKey.isPressed)
         {
-            s += speed;
+            s += maxSpeed;
         }
         if (Keyboard.current.sKey.isPressed)
         {
-            s -= speed;
+            s -= maxSpeed;
         }
         if (Keyboard.current.aKey.isPressed)
         {
@@ -338,8 +342,17 @@ public class Player : MonoBehaviour
             turn += turningSpeed;
         }
 
+        if (Mathf.Abs(speed) > 0.1f)
+        {
+            if (!wakeSystem.isPlaying)
+                wakeSystem.Play();
+        }
+        else
+            wakeSystem.Stop();
+
+        speed = Mathf.Lerp(speed, s, Time.deltaTime);
         rb.velocity = Vector3.zero;
-        rb.MovePosition(transform.position + transform.forward * s * Time.deltaTime);
+        rb.MovePosition(transform.position + transform.forward * speed * Time.deltaTime);
         if (s != 0.0f)
             gas -= Time.deltaTime;
         cameraOrigin.rotation = cameraOrigin.rotation * Quaternion.Euler(0f, turn * Time.deltaTime, 0f);

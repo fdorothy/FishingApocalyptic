@@ -76,13 +76,13 @@ public class Player : MonoBehaviour
         {
             switch (playerStatistics.gas)
             {
-                case 1: return 15f;
-                case 2: return 20f;
-                case 3: return 25f;
-                case 4: return 30f;
-                case 5: return 45f;
-                case 6: return 50f;
-                default: return 15f;
+                case 1: return 30f;
+                case 2: return 40f;
+                case 3: return 55f;
+                case 4: return 60f;
+                case 5: return 75f;
+                case 6: return 80f;
+                default: return 30f;
             }
         }
     }
@@ -398,6 +398,17 @@ public class Player : MonoBehaviour
             Messages.singleton.SetMessage("<spacebar>");
             currentNPC = other.gameObject.GetComponent<NPC>();
             playerState = PlayerState.NPC;
+        }
+        if (other.gameObject.tag == "Gas")
+        {
+            gas += 10f;
+            if (gas > maxGas)
+                gas = maxGas;
+            Destroy(other.gameObject);
+        }
+        if (other.gameObject.tag == "Shark")
+        {
+            gas = -1f;
         }
     }
 

@@ -9,10 +9,12 @@ public class Spawner : MonoBehaviour
     public List<Transform> spawns = new List<Transform>();
     public float maxRange = 10f;
     public int maxSpawn = 10;
+    Collider spawnArea;
 
     // Start is called before the first frame update
     void Start()
     {
+        spawnArea = GameObject.Find("SpawnArea").GetComponent<Collider>();
         for (int i = 0; i < maxSpawn; i++)
             RandomSpawn();
     }
@@ -24,12 +26,10 @@ public class Spawner : MonoBehaviour
         while (i < spawns.Count)
         {
             Transform b = spawns[i];
-            if (!InRange(b.position))
+            if (b == null)
             {
-                Destroy(b.gameObject);
                 spawns.RemoveAt(i);
-            }
-            else
+            } else
             {
                 i++;
             }
@@ -47,10 +47,17 @@ public class Spawner : MonoBehaviour
 
     Transform RandomSpawn(bool useMaxRange = false)
     {
+        int maxIterations = 20;
+        Vector3 pt;
+        do
+        {
+            float x = Random.Range(spawnArea.bounds.min.x, spawnArea.bounds.max.x);
+            float z = Random.Range(spawnArea.bounds.min.z, spawnArea.bounds.max.z);
+            pt = new Vector3(x, 0f, z);
+            maxIterations--;
+        } while (Physics.OverlapSphere(pt, 0f).Length > 0 && maxIterations > 0);
         Transform t = Spawn();
-        float theta = Random.Range(0f, 360f) * Mathf.PI / 180f;
-        float r = Random.Range(useMaxRange ? 0f : maxRange * 0.9f, maxRange);
-        t.position = new Vector3(Mathf.Cos(theta) * r, 0f, Mathf.Sin(theta) * r) + around.position;
+        t.position = pt;
         spawns.Add(t);
         return t;
     }

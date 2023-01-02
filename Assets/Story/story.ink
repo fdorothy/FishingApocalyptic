@@ -71,7 +71,9 @@ Thank you.
 
 == FindFish ==
 
-You found the fish!
+You found the koi fish!
+A ring is inside its mouth.
+This must be Edna's.
 ~ hasRing = true
 
 -> menu

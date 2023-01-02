@@ -18,6 +18,7 @@ public class Bobber : MonoBehaviour
     Rigidbody rb;
     Tween activeTween;
     public bool inBubbles = false;
+    public Bubble bubble;
 
     // Start is called before the first frame update
     void Start()
@@ -76,6 +77,7 @@ public class Bobber : MonoBehaviour
         {
             inBubbles = true;
             Debug.Log("in the bubble");
+            bubble = other.transform.parent.GetComponent<Bubble>();
         }
     }
 

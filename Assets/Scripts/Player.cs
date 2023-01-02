@@ -98,6 +98,11 @@ public class Player : MonoBehaviour
     int fishPoints = 0;
     PlayerState playerState = PlayerState.READY;
 
+    public void SetPlayerState(PlayerState state)
+    {
+        playerState = state;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -130,6 +135,8 @@ public class Player : MonoBehaviour
         {
             Debug.Log("hit!");
             playerStatistics.points += fishPoints;
+            if (bobber && bobber.bubble)
+                bobber.bubble.SendMessage("OnCatch");
             PullLineIn();
         };
         fishbar.OnMiss += () =>
@@ -206,6 +213,8 @@ public class Player : MonoBehaviour
             }
         }
         UpdateLine();
+        if (Keyboard.current.escapeKey.wasPressedThisFrame)
+            upgradeMenu.gameObject.SetActive(!upgradeMenu.gameObject.activeSelf);
     }
 
     void UpdateReady()
@@ -253,8 +262,6 @@ public class Player : MonoBehaviour
 
     void UpdateDocked()
     {
-        if (Keyboard.current.spaceKey.wasPressedThisFrame)
-            upgradeMenu.gameObject.SetActive(!upgradeMenu.gameObject.activeSelf);
         gas = maxGas;
     }
 
@@ -316,7 +323,7 @@ public class Player : MonoBehaviour
 
     void ReadyToCast()
     {
-        if (playerState != PlayerState.DOCKED)
+        if (playerState != PlayerState.DOCKED && playerState != PlayerState.DIALOGUE)
             playerState = PlayerState.READY;
     }
 
@@ -387,7 +394,7 @@ public class Player : MonoBehaviour
             playerState = PlayerState.DOCKED;
             castStrength = minCastStrength;
             dock = other.GetComponent<Dock>();
-            Messages.singleton.SetMessage("<spacebar>");
+            Messages.singleton.SetMessage("<esc>");
             timer.paused = true;
             if (bobber)
                 Destroy(bobber.gameObject);

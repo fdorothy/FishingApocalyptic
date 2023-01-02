@@ -15,7 +15,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: b3104b7862c3a604095def0b8bca5f43,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 39.17351
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b3104b7862c3a604095def0b8bca5f43,
         type: 3}
@@ -35,27 +35,27 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: b3104b7862c3a604095def0b8bca5f43,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7035765
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b3104b7862c3a604095def0b8bca5f43,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.70357656
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b3104b7862c3a604095def0b8bca5f43,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.07056969
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b3104b7862c3a604095def0b8bca5f43,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.07056968
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b3104b7862c3a604095def0b8bca5f43,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: -90
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b3104b7862c3a604095def0b8bca5f43,
         type: 3}
@@ -65,7 +65,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: b3104b7862c3a604095def0b8bca5f43,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: -11.455
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: b3104b7862c3a604095def0b8bca5f43,
         type: 3}
@@ -75,7 +75,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: b3104b7862c3a604095def0b8bca5f43,
         type: 3}
       propertyPath: m_Name
-      value: house2
+      value: house2 Variant
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: b3104b7862c3a604095def0b8bca5f43,
         type: 3}
@@ -101,5 +101,5 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.019999998, y: 0.019999994, z: 0.026177937}
-  m_Center: {x: 0, y: 0, z: 0.003088971}
+  m_Size: {x: 0.8783051, y: 1.26155, z: 2.4907603}
+  m_Center: {x: -0.72002727, y: 0.8229916, z: 0.5780499}

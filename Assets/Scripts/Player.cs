@@ -160,15 +160,8 @@ public class Player : MonoBehaviour
                 if (bobber && bobber.inBubbles)
                     fishProb += 0.5f;
                 Debug.Log("fish prob = " + fishProb);
-                if (p < fishProb && bobber)
-                {
-                    fishPoints = 1;
-                    Bite();
-                } else if (p < 0.8f)
-                {
-                    fishPoints = 0;
-                    Bite();
-                }
+                fishPoints = 1;
+                Bite();
             }
             yield return new WaitForSeconds(1.0f);
         }

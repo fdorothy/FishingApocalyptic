@@ -20,5 +20,6 @@ public class Bubble : MonoBehaviour
             FindObjectOfType<Player>().SetPlayerState(Player.PlayerState.DIALOGUE);
             Debug.Log("playing chapter findfish");
         }
+        Destroy(gameObject);
     }
 }

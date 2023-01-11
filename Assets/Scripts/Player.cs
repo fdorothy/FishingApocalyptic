@@ -28,6 +28,7 @@ public class Player : MonoBehaviour
     UpgradeMenu upgradeMenu;
     NPC currentNPC;
     public ParticleSystem wakeSystem;
+    public static Player singleton;
 
     public class PlayerStatistics
     {
@@ -103,6 +104,11 @@ public class Player : MonoBehaviour
         playerState = state;
     }
 
+    private void Awake()
+    {
+        singleton = this;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -153,14 +159,19 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(1.0f);
         while (bobber)
         {
-            if (playerState == PlayerState.CAST)
+            if (playerState == PlayerState.CAST && bobber.inBubbles)
             {
                 float p = Random.Range(0.0f, 1.0f);
                 float fishProb = fishProbability;
                 if (bobber && bobber.inBubbles)
+                {
                     fishProb += 0.5f;
+                    fishPoints = 1;
+                } else
+                {
+                    fishPoints = 0;
+                }
                 Debug.Log("fish prob = " + fishProb);
-                fishPoints = 1;
                 Bite();
             }
             yield return new WaitForSeconds(1.0f);
@@ -273,8 +284,9 @@ public class Player : MonoBehaviour
         {
             if (!StoryManager.singleton.story.canContinue)
             {
-                Invoke("ReadyToCast", 0.5f);
-                Messages.singleton.HideMessage();
+                Messages.singleton.SetMessage("<spacebar>");
+                playerState = PlayerState.NPC;
+                //Messages.singleton.HideMessage();
             } else
             {
                 StoryManager.singleton.Continue();
@@ -353,8 +365,8 @@ public class Player : MonoBehaviour
         speed = Mathf.Lerp(speed, s, Time.deltaTime);
         rb.velocity = Vector3.zero;
         rb.MovePosition(transform.position + transform.forward * speed * Time.deltaTime);
-        if (s != 0.0f)
-            gas -= Time.deltaTime;
+        /*if (s != 0.0f)
+            gas -= Time.deltaTime;*/
         cameraOrigin.rotation = cameraOrigin.rotation * Quaternion.Euler(0f, turn * Time.deltaTime, 0f);
         rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, cameraOrigin.rotation, Time.deltaTime * Mathf.Abs(s) * turningSpeed));
     }

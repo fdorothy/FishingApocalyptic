@@ -4,10 +4,13 @@ using UnityEngine;
 
 public class NPC : MonoBehaviour
 {
-    public string chapter;
-
     public void Play()
     {
-        StoryManager.singleton.PlayChapter(chapter);
+        StoryManager.singleton.PlayChapter(transform.name);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawIcon(transform.position, "olive.png", true);
     }
 }

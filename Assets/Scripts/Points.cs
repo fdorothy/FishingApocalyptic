@@ -20,7 +20,7 @@ public class Points : MonoBehaviour
         if (player && text)
         {
             Player.PlayerStatistics s = player.playerStatistics;
-            text.text = s.points.ToString();
+            text.text = s.points.ToString() + " fish";
         }
     }
 }

@@ -22,4 +22,9 @@ public class Bubble : MonoBehaviour
         }
         Destroy(gameObject);
     }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawIcon(transform.position, "fish.png", true);
+    }
 }

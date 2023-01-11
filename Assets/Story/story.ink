@@ -16,12 +16,11 @@ VAR hasRing = false
 
 == Tom ==
 
-Hey, I'm Tom.
 The whole town was flooded months ago.
 We had no where else to go but up on the roofs.
 If you're looking for fish there are plenty out there.
 Between the bags of trash and flooded homes.
-Don't know if I would trust eating them.
+But I don't know if I would trust eating them.
 
 -> menu
 

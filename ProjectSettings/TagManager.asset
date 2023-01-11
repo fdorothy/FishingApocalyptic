@@ -9,6 +9,7 @@ TagManager:
   - NPC
   - Gas
   - Shark
+  - Wall
   layers:
   - Default
   - TransparentFX

@@ -12,6 +12,9 @@ VAR hasRing = false
 + [Tom] -> Tom
 + [Edna] -> Edna
 + [Joe] -> Joe
++ [Ralph] -> Ralph
++ [Sam] -> Sam
++ [Walter] -> Walter
 + [Find Fish] -> FindFish
 
 == Tom ==
@@ -77,6 +80,18 @@ Tell me, how did you find it?
 Is that so? How wonderful.
 It is one of the few possessions I have left in this world.
 Thank you.
+
+-> menu
+
+== Ralph ==
+
+-> menu
+
+== Sam ==
+
+-> menu
+
+== Walter ==
 
 -> menu
 

@@ -2,78 +2,126 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using UnityEngine.UI;
 using TMPro;
-using System.IO;
 
 public class StoryScroller : MonoBehaviour
 {
-    public TMP_Text text_obj;//NOTICE TEXT MESH MOTHER FUCKING PRO GOD DAMN YOU MOTHER FUCKERS
-    public AudioClip sfx_click;
-    public float type_speed = 0.015f;
-    public string filePathToRichTextDocument;
 
+    // █ is ascii 219, and it is a 
+    //                             h e s i t a t i o n
+    // of 1 second
+
+    public TMP_Text text_obj;
+    public AudioClip sfx_click;
+    public char hesitation_character = '█';
+    float type_speed_random = 0.05f;//notice the delay with this inside LineTyper. It is slightly randomized
     AudioSource speaker;
-    string[] lines;
+    Queue<TypeLine> buffer = new Queue<TypeLine>();//will consume lines from buffer during typing
+
+    //private class to hold what is needed for each line
+    private class TypeLine
+    {
+        public TypeLine(string s, float t)
+        {
+            this.text = s;
+            this.waitAfter = t;
+        }
+
+        public string text = "";
+        public float waitAfter = 0f;
+    }
+
     void Start()
     {
         speaker = this.gameObject.AddComponent<AudioSource>();
-        string fileContent = File.ReadAllText(filePathToRichTextDocument);
-        lines = fileContent.Split(new string[] { "\n", "\r\n" }, StringSplitOptions.None);
-        StartCoroutine(ChapterOne());
+        StartCoroutine(LineTyper());
     }
 
-    //Typer types a string, one letter at a time to text_obj
-    //waitAfter = optional; delay at very end.
-    //callbackOnCompletion = optional; called after delay and at end.
-    //Important note, uses bool isDone.
-    //isDone is used by the routine that waits on Typer to finish
-    bool isDone;
-    IEnumerator Typer(string typeThis, float waitAfter = 0f, Func<bool> callbackOnCompletion = null)
+    //Use this to Type a line
+    public void Write(string toType, float waitAfter = 0f)
     {
-        isDone = false;
+        buffer.Enqueue(new TypeLine(toType, waitAfter));
+    }
 
-        while (typeThis != "")
+    IEnumerator LineTyper()
+    {
+        while (true)
         {
-            text_obj.text += typeThis.Substring(0, 1);//consume the first character
-            typeThis = typeThis.Substring(1);//then set TypeThis to everything After the 1st character
-            if (sfx_click) speaker.PlayOneShot(sfx_click);
-            yield return new WaitForSeconds(type_speed);
+            yield return null;
+            if (buffer.Count != 0)
+            {
+                TypeLine typeLine = buffer.Dequeue();
+                string typeThis = typeLine.text;
+                float waitAfter = typeLine.waitAfter;
+
+                while (typeThis != "")
+                {
+                    string character = typeThis.Substring(0, 1);//consume the first character
+
+                    //█ will pause briefly. █ will not be typed
+                    //cursor will blink a few times
+                    if (character == hesitation_character.ToString())
+                    {
+                        text_obj.text = text_obj.text.Replace("|", "");
+                        yield return new WaitForSeconds(0.5f);
+                        text_obj.text += "|";
+                        yield return new WaitForSeconds(0.5f);
+                        text_obj.text = text_obj.text.Replace("|", "");
+                        yield return new WaitForSeconds(0.5f);
+                        typeThis = typeThis.Substring(1);// this skips forward and skips the hesitation_character
+                    }
+                    else
+                    {
+                        text_obj.text = text_obj.text.Replace("|", "");
+                        text_obj.text += character + "|";
+                        typeThis = typeThis.Substring(1);//then set TypeThis to everything After the 1st character
+                        if (sfx_click) speaker.PlayOneShot(sfx_click);
+                    }
+
+                    yield return new WaitForSeconds(type_speed_random + (type_speed_random * UnityEngine.Random.value));
+                }
+
+                //while waiting for next line,
+                //blink cursor and deduct time
+                //but ONLY if the waitAfter time is long enough to notice
+                if (waitAfter > 1f)
+                {
+                    float startTimer = Time.time;
+                    while (waitAfter > 0)
+                    {
+                        waitAfter -= Time.time - startTimer;
+                        //Debug.Log($"time left: {waitAfter}");
+
+                        text_obj.text = text_obj.text.Replace("|", "");
+                        yield return new WaitForSeconds(0.5f);
+                        text_obj.text += "|";
+                        yield return new WaitForSeconds(0.5f);
+                    }
+                }
+                else
+                {
+                    yield return new WaitForSeconds(waitAfter);
+                }
+
+
+                text_obj.text = GetXBottomLines(18, text_obj.text);
+            }
+            //When buffer is EMPTY blink the cursor
+            else
+            {
+                text_obj.text = text_obj.text.Replace("|", "");
+                yield return new WaitForSeconds(0.5f);
+                text_obj.text += "|";
+                yield return new WaitForSeconds(0.5f);
+            }
+
         }
-
-        yield return new WaitForSeconds(waitAfter);
-        if (callbackOnCompletion != null) callbackOnCompletion();
-        isDone = true;
-    }
-
-    //A convenience method for calling Typer
-    void TYPE(string toType, float waitAfter = 0f)
-    {
-        StartCoroutine(Typer(toType, waitAfter));//Coroutine will set isDone to true when is done
-    }
-
-    //types a variable number of newlines
-    void NewLine(int howMany = 1, float waitAfter = 0f)
-    {
-        string s = "";
-        for (int i = 0; i < howMany; i++)
-        {
-            s += "\n";
-        }
-
-        TYPE(s);
-    }
-
-    //clears the text screen
-    void ClearScreen(float waitAfter = 0f)
-    {
-        text_obj.text = "";
     }
 
     //a string post-processor, to be used
     //after text_obj has been written to.
     //returns: the last X lines of a string, delimit is \n
-    string GetXBottomLines(int x, string bigString)
+    private string GetXBottomLines(int x, string bigString)
     {
         string s = "";
         string[] allLines = bigString.Split("\n");
@@ -94,32 +142,22 @@ public class StoryScroller : MonoBehaviour
         return s;
     }
 
-    //-----------------------------------------------------------------------------------------------
-    public IEnumerator PrintAllLinesRoutine()
+    //types a variable number of newlines
+    public void NewLine(int howMany = 1)
     {
-        ClearScreen();
-        foreach (string line in lines)
+        string s = "";
+        for (int i = 0; i < howMany; i++)
         {
-            TYPE(line, 0);
-            yield return new WaitUntil(() => isDone == true);
-            text_obj.text = GetXBottomLines(18, text_obj.text);
+            s += "\n";
         }
+
+        Write(s);
     }
 
-
-    public IEnumerator ChapterOne()
+    //clears the text screen
+    public void ClearScreen()
     {
-        TYPE("Once...", 1f);
-        yield return new WaitUntil(() => isDone == true);
-        NewLine(2);
-        yield return new WaitUntil(() => isDone == true);
-        TYPE("Upon...", 1f);
-        yield return new WaitUntil(() => isDone == true);
-        NewLine(2);
-        yield return new WaitUntil(() => isDone == true);
-        TYPE("A Time....");
-        yield return new WaitUntil(() => isDone == true);
-        NewLine(2);
-        yield return new WaitUntil(() => isDone == true);
+        text_obj.text = "";
     }
+
 }
